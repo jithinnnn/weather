@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="weather.css">
+</head>
+<body>
+<div class="text-center bg-dark text-white p-5 my-5 w-50 container t1">
+    <h1 class="text-center">Weather App</h1><br>
+    <input id="data" type="text" placeholder="Enter Place" class="form-control w-50 container"><br>
+    <button type="button" onclick="search()" class="btn btn-info">Search</button> <button id="b1" type="button" onclick="searchLocation()" class="btn btn-info">Current Location</button> 
+</div>
+<div id="res" class='w-50'></div>
+</body>
+<script>
+    function search(){
+        name=data.value
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${name}&appid=5b4bee0ba241d092159faf007e166080`).then(response=>response.json()).then(out=>displayData(out))
+    }
+
+    function displayData(dataobj){
+        name=dataobj.name 
+        longitude=dataobj.coord.lon
+        latitude=dataobj.coord.lat
+        main1=dataobj.weather[0].main
+        desc=dataobj.weather[0].description
+        temp=Math.floor(dataobj.main.temp)
+        temp=temp-273
+        feelslike=dataobj.main.feels_like
+        feelslike=Math.floor(feelslike-273)
+        tempmin=dataobj.main.temp_min
+        tempmin=Math.floor(tempmin-273)
+        tempmax=dataobj.main.temp_max
+        tempmax=Math.floor(tempmax-273)
+        pressure=dataobj.main.pressure
+        humidity=dataobj.main.humidity
+        country=dataobj.sys.country
+        visibility=dataobj.visibility
+        windspeed=dataobj.wind.speed
+        sunrise=Math.floor(dataobj.sys.sunrise)
+        sunset=Math.floor(dataobj.sys.sunset)
+        timezone=dataobj.timezone
+
+        
+
+        res.innerHTML=`<section class=" vh-100" style="background-color: #cdc4f9;">
+  <div id="lol" class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-12 col-xl-10 c1">
+
+        <div class=" m8 card shadow-0 border border-dark border-5 text-dark" style="border-radius: 10px;">
+          <div class="card-body">
+
+              <div class="col-md-9 text-center border-5 border-dark py-4"
+                style="margin-top: -1.5rem; margin-bottom: -1.5rem;">
+                <div class=" m4  w-50 container-fluid justify-content-around mt-3">
+                  <p class="small fs-5"><strong>${name}</strong></p>
+                  <p class="small">${longitude}</p>
+                  <p class="small">${latitude}</p>
+                </div>
+                <div class=" m6 d-flex justify-content-around align-items-center">
+                  <p class=" m1 fw-bold mb-0" style="font-size: 100px;">${temp}°C</p>
+                  <div class=" m2 text-start">
+                    <p class="medium">Pressure : ${pressure}</p>
+                    <p class="medium">Humidity : ${humidity}</p>
+                    <p class="medium mb-0">Windspeed : ${windspeed}</p>
+                  </div>
+                </div>
+                <div class="m3 d-flex justify-content-around align-items-center mb-3">
+                  <div class="flex-column">
+                    <i class="fas fa-minus"></i>
+                  </div>
+                  <div class="flex-column border" style="border-radius: 10px; padding: .75rem">
+                    <p class="small mb-1">Feels Like</p>
+                    <p class="small mb-0"><strong>${feelslike}°C</strong></p>
+                  </div>
+                  <div class="flex-column  border" style="border-radius: 10px; padding: .75rem" >
+                    <p class="small mb-1">Country</p>
+                    <p class="small mb-0"><strong>${country}</strong></p>
+                  </div>
+                  <div class="flex-column  border" style="border-radius: 10px; padding: .75rem">
+                    <p class="small mb-1">Visibility</p>
+                    <p class="small mb-0"><strong>${visibility}</strong></p>
+                  </div>
+                  <div class="flex-column border" style="border-radius: 10px; padding: .75rem">
+                    <p class="small mb-1">Timezone</p>
+                    <p class="small mb-0"><strong>${timezone}</strong></p>
+                  </div>
+                  <div class="flex-column border" style="border-radius: 10px; padding: .75rem">
+                    <p class="small mb-1">Max Temp</p>
+                    <p class="small mb-0"><strong>${tempmin}</strong></p>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>`
+    }
+    function searchLocation(){
+    currentLocation();    
+}
+
+function currentLocation() {
+    navigator.geolocation.getCurrentPosition(success => {
+        lat = success.coords.latitude;
+        lon = success.coords.longitude;
+        fetchWeatherData(lat,lon);
+    });
+}
+
+function fetchWeatherData(lat, lon) {
+    try {
+        const apiKey = '5b4bee0ba241d092159faf007e166080';
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(dataObj=> displayData(dataObj))
+            .catch(error => console.error('Error fetching weather data:', error));
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+    }
+}
+
+</script>
+</html>
